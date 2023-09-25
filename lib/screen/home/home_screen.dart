@@ -201,10 +201,10 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
           options: CarouselOptions(
-            height: 275,
+            height: 300,
             animateToClosest: false,
             enableInfiniteScroll: false,
-            aspectRatio: 1 / 2,
+            aspectRatio: 1 / 3,
             padEnds: false,
             onPageChanged: (index, reason) {
               setState(() {

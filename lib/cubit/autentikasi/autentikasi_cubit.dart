@@ -17,21 +17,28 @@ class AutentikasiCubit extends Cubit<AutentikasiState> {
     emit(AutentikasiLoading());
     await Future.delayed(const Duration(seconds: 2));
     final data = await LocalStrorage().getListUserFromLocal();
-    listUser = (data as List<dynamic>)
-        .map(
-          (datauser) => UserModels.fromJson(datauser),
-        )
-        .toList();
-    final index = listUser.indexWhere(
-        (element) => element.email!.toLowerCase() == user.email!.toLowerCase());
+    if (data != null) {
+      listUser = (data as List<dynamic>)
+          .map(
+            (datauser) => UserModels.fromJson(datauser),
+          )
+          .toList();
+      final index = listUser.indexWhere((element) =>
+          element.email!.toLowerCase() == user.email!.toLowerCase());
 
-    if (index == -1) {
+      if (index == -1) {
+        listUser.add(user);
+        LocalStrorage().lsitUser(listUser);
+        LocalStrorage().saveUser(user);
+        emit(AutentikasiBerhasil(user));
+      } else {
+        emit(AutentikasiPendaftaranGagal('Email sudah terdaftar'));
+      }
+    } else {
       listUser.add(user);
       LocalStrorage().lsitUser(listUser);
       LocalStrorage().saveUser(user);
       emit(AutentikasiBerhasil(user));
-    } else {
-      emit(AutentikasiPendaftaranGagal('Email sudah terdaftar'));
     }
   }
 
@@ -39,15 +46,23 @@ class AutentikasiCubit extends Cubit<AutentikasiState> {
     final data = await LocalStrorage().getListUserFromLocal();
     emit(AutentikasiLoading());
     await Future.delayed(const Duration(seconds: 2));
-    final index = data.indexWhere((element) =>
-        element['email'].toLowerCase() == email.toLowerCase() &&
-        element['password'] == password);
-    if (index != -1) {
-      final user = UserModels.fromJson(data[index]);
-      LocalStrorage().saveUser(user);
-      emit(AutentikasiBerhasil(user));
+    if (data != null) {
+      final index = data.indexWhere(
+          (element) => element['email'].toLowerCase() == email.toLowerCase());
+      if (index != -1) {
+        final isPassword = data[index]['password'] == password;
+        if (isPassword) {
+          final user = UserModels.fromJson(data[index]);
+          LocalStrorage().saveUser(user);
+          emit(AutentikasiBerhasil(user));
+        } else {
+          emit(AutentikasiLoginGagal('Credential tidak sesuai'));
+        }
+      } else {
+        emit(AutentikasiLoginGagal('Account not registered'));
+      }
     } else {
-      emit(AutentikasiLoginGagal('Credential tidak sesuai'));
+      emit(AutentikasiLoginGagal('Account not registered'));
     }
   }
 

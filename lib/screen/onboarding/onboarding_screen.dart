@@ -10,7 +10,6 @@ class OnBoarding extends StatelessWidget {
     return Scaffold(
       body: BlocConsumer<AutentikasiCubit, AutentikasiState>(
         listener: (context, state) {
-          print(state);
           if (state is AutentikasiBerhasil) {
             Navigator.pushAndRemoveUntil(
               context,
@@ -23,7 +22,7 @@ class OnBoarding extends StatelessWidget {
         },
         builder: (context, state) {
           return PageView.builder(
-            controller: context.read<ScreenCubit>().pageController,
+            controller: context.watch<ScreenCubit>().pageController,
             onPageChanged: (index) {
               screenCubit.setScreen(newScreen: index);
             },
